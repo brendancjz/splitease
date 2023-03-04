@@ -1,0 +1,46 @@
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+#intro-title {
+  font-size: 30px;
+  font-weight: bold;
+  color: #673AB7;
+}
+
+#intro-desc {
+  font-size: 20px;
+  font-style: italic;
+  color: #673AB7;
+}
+
+.form-div {
+  max-width: 400px;
+  width: 60%;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #673AB7;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 0 auto;
+}
+
+#getting-started-title {
+  font-size: 20px;
+  color: #673AB7;
+}
+
+.getting-started {
+  display: flex;
+  flex-direction: column;
+}
+
+.next-button {
+  margin-top: 20px;
+}

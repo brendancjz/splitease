@@ -1,0 +1,26 @@
+<div class="home">
+  <div id="home-intro">
+      <div class="intro">
+          <h1 id="intro-title">SplitEase</h1>
+          <p id="intro-desc">Help split the bill with ease!</p>
+          <p style="font-size: 10px">*disclaimer: For now, SplitEase can only split the bill fairly to everyone.</p>
+      </div>
+  </div>
+  <div class="form-div">
+    <h2 id="getting-started-title">Start New Bill</h2>
+    <form class="getting-started" (ngSubmit)="submitForm()">
+      <mat-form-field>
+        <mat-label>group name</mat-label>
+        <input [(ngModel)]="groupName" name="groupName" matInput placeholder="Dinner Gang">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>num of people</mat-label>
+        <input [(ngModel)]="numOfPeople" name="numOfPeople" type="number" matInput min="2"
+              placeholder="4" required>
+      </mat-form-field>
+      <button class="next-button"
+              mat-raised-button color="primary"
+              type="submit">Next</button>
+    </form>
+  </div>
+</div>
