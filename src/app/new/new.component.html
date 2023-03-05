@@ -2,10 +2,22 @@
   <div id="new-header">
       <h1 id="header-title">SplitEase</h1>
       <p id="header-desc">Splitting for <u style="font-size: 25px">{{engine.groupName}}</u></p>
-      <div style="font-size: 12px;">
-        <p style="margin-bottom: 2px;">1. Enter Person's Name. (Optional)</p>
-        <p style="margin-bottom: 2px;">2. Enter Item's Name and Cost. <b>Tap the Add button to confirm.</b></p>
-        <p style="margin-bottom: 2px;">3. Repeat for next person and tap Split! when you're done.</p>
+      <div class="header-main">
+        <div class="instructions">
+          <p style="margin-bottom: 2px;">1. Enter Person's Name. (Optional)</p>
+          <p style="margin-bottom: 2px;">2. Enter Item's Name and Cost. <b>Tap the Add button to confirm.</b></p>
+          <p style="margin-bottom: 2px;">3. Repeat for next person and tap Split! when you're done.</p>
+        </div>
+        <div class="currency">
+          <p style="margin: 0 10px 0 0; display:inline;">currency: </p>
+          <mat-form-field style="width:50px;">
+            <mat-select [(value)]="currency">
+              <mat-option value="&pound;">&pound;</mat-option>
+              <mat-option value="&dollar;">&dollar;</mat-option>
+              <mat-option value="&euro;">&euro;</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
       </div>
     </div>
   <div id="splitting-div">
@@ -16,7 +28,7 @@
             <mat-label>person name</mat-label>
             <input [(ngModel)]="person.name" name="personName" matInput [placeholder]="getNamePlaceholder(person.id)">
           </mat-form-field>
-          <p *ngIf="showItemsTable(person)" style="margin: 0"><strong>Total:</strong> {{this.engine.generatePersonTotalItemCost(person)}}</p>
+          <p *ngIf="showItemsTable(person)" style="margin: 0"><strong>Total: </strong>{{this.currency}}{{this.engine.generatePersonTotalItemCost(person)}}</p>
         </div>
 
         <div class="added-items">
@@ -26,10 +38,10 @@
               <th>Cost</th>
               <th></th>
             </tr>
-            <tr *ngFor="let item of person.bill">
-              <td>{{item.name}}</td>
-              <td>{{item.cost}}</td>
-              <td style="width: 1px"><button mat-raised-button (click)="deleteItemFromPerson(person,item)">Del</button></td>
+            <tr *ngFor="let entry of getPersonEntries(person)">
+              <td style="text-align: center;">{{entry.billItem.name}}</td>
+              <td style="text-align: center;">{{entry.billItem.cost}}</td>
+              <td style="width: 1px"><button mat-raised-button (click)="deleteEntry(entry)">Del</button></td>
             </tr>
           </table>
         </div>
@@ -56,22 +68,23 @@
   <div id="result-div">
     <div class="card-container" *ngIf="this.shouldShowResultTable">
       <div class="result-card">
-        <h1>Result</h1>
+        <h1><b>Result</b></h1>
+        <p>Here's the result! You should see the person <b>(Payer)</b> who owes money <b>(Amount)</b> to whom <b>(Receiver)</b>.</p>
         <table style="width: 100%">
           <tr>
             <th>Payer</th>
             <th>Receiver</th>
-            <th>Amount</th>
+            <th>Amount ({{this.currency}})</th>
           </tr>
           <tr *ngFor="let solution of this.engine.solution">
-            <td>{{solution.personToPay.name}}</td>
-            <td>{{solution.personToReceive.name}}</td>
-            <td>{{solution.amount}}</td>
+            <td style="text-align:center;">{{solution.personToPay.name}}</td>
+            <td style="text-align:center;">{{solution.personToReceive.name}}</td>
+            <td style="text-align:center;">{{solution.amount}}</td>
           </tr>
         </table>
       </div>
       <div style="width: 60%; min-width: 300px;">
-        <p style="text-align: center; font-size: 12px;">This is the result of splitting the bill! Forgotten to add an item? Simply edit the bill above and tap <b>Split!</b> again.</p>
+        <p style="text-align: center; font-size: 12px;">Forgotten to add an item? Simply edit the bill above and tap <b>Split!</b> again.</p>
       </div>
       <div class="button-div">
         <button mat-raised-button color="primary"  (click)="confirmRestartSplit()">Restart</button>

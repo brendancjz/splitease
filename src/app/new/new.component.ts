@@ -3,10 +3,11 @@ import {
   ElementRef,
   OnInit,
   QueryList,
-  ViewChildren
+  ViewChildren,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MyGuard } from '../my-guard.guard';
+import { BillEntry } from '../resource/BillEntry';
 import { BillItem } from '../resource/BillItem';
 import { Person } from '../resource/Person';
 import { SplitEngine } from '../resource/SplitEngine';
@@ -25,6 +26,7 @@ export class NewComponent implements OnInit {
   engine: SplitEngine = new SplitEngine();
   items: { name: string | undefined; cost: number | undefined }[] = [];
   shouldShowResultTable: boolean = false;
+  currency: string = '£';
 
   constructor(private route: ActivatedRoute, private router: Router) {}
 
@@ -47,7 +49,7 @@ export class NewComponent implements OnInit {
 
   addItemToBill(id: number, idx: number) {
     if (this.items[id].name != undefined && this.items[id].cost != undefined) {
-      this.engine.group[id].bill.push({ ...this.items[id] });
+      this.engine.createNewBillEntry(this.items[id], this.engine.group[id], this.engine.group)
       this.items[id] = { name: undefined, cost: undefined };
     }
 
@@ -58,23 +60,25 @@ export class NewComponent implements OnInit {
   }
 
   showItemsTable(person: Person): boolean {
-    return person.bill.length > 0;
+    return this.engine.doesPersonHaveEntries(person);
   }
 
-  deleteItemFromPerson(person: Person, item: BillItem) {
-    let idx = person.bill.indexOf(item);
-    if (idx > -1) {
-      person.bill.splice(idx, 1);
-    }
+  deleteEntry(entry: BillEntry) {
+    this.engine.deleteEntry(entry);
+  }
+
+  getPersonEntries(person: Person) {
+    return this.engine.getPersonEntries(person);
   }
 
   doSplit() {
+    console.log(this.currency);
     this.engine.doSplit();
-    this.shouldShowResultTable = this.engine.solution.length !== 0;
+    this.shouldShowResultTable = this.engine.isCompleted();
   }
 
   confirmNavigationToHome() {
-    if (confirm("Have you screenshotted the Result?")) {
+    if (confirm('Have you screenshotted the Result?')) {
       this.router.navigate(['/home']);
       return true;
     } else {
@@ -83,7 +87,7 @@ export class NewComponent implements OnInit {
   }
 
   confirmRestartSplit() {
-    if (confirm("Are you sure to restart the Split?")) {
+    if (confirm('Are you sure to restart the Split?')) {
       this.restartSplit();
       return true;
     } else {
@@ -104,8 +108,8 @@ export class NewComponent implements OnInit {
   scrollToResult() {
     setTimeout(() => {
       window.scrollTo({
-        top: document.getElementById("result-div")!.offsetTop,
-        behavior: "smooth"
+        top: document.getElementById('result-div')!.offsetTop,
+        behavior: 'smooth',
       });
     }, 200);
   }
