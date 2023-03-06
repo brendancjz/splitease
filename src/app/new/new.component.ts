@@ -59,12 +59,12 @@ export class NewComponent implements OnInit {
     }
   }
 
-  showItemsTable(person: Person): boolean {
-    return this.engine.doesPersonHaveEntries(person);
-  }
-
   deleteEntry(entry: BillEntry) {
     this.engine.deleteEntry(entry);
+  }
+
+  showItemsTable(person: Person): boolean {
+    return this.engine.doesPersonHaveEntries(person);
   }
 
   getPersonEntries(person: Person) {

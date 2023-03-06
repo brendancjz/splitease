@@ -4,33 +4,21 @@ import { Person } from './Person';
 
 export class SplitEngine {
   groupName: string;
-  numOfPeople: number;
   group: Person[];
-  totalPool: number;
-  eachPersonShouldSpend: number;
   spending: { person: Person; haveSpent: number; toSpend: number }[];
-
-  peopleToPay: { person: Person; amount: number }[];
-  peopleToReceive: { person: Person; amount: number }[];
-  solution: { personToPay: Person; personToReceive: Person; amount: number }[];
-
+  solution: { personToPay: Person; personToReceive: Person; amount: string }[];
   entries: BillEntry[];
 
   constructor(groupName?: string, group?: Person[]) {
     this.groupName = groupName || '';
-    this.numOfPeople = group?.length || 0;
     this.group = group || [];
-    this.totalPool = 0;
-    this.eachPersonShouldSpend = 0;
     this.spending = [];
     this.entries = [];
 
-    for (let i = 0; i < this.numOfPeople; i++) {
+    for (let i = 0; i < this.group.length; i++) {
       this.spending.push({ person: this.group[i], haveSpent: 0, toSpend: 0 });
     }
 
-    this.peopleToPay = [];
-    this.peopleToReceive = [];
     this.solution = [];
   }
 
@@ -80,72 +68,79 @@ export class SplitEngine {
 
     this.resetEngine();
 
+    let totalPool: number = 0;
     this.spending.forEach((spender) => {
-      this.totalPool += spender.haveSpent;
+      totalPool += spender.haveSpent;
     });
 
-    this.eachPersonShouldSpend = this.totalPool / this.numOfPeople;
+    let eachPersonShouldSpend: number = totalPool / this.group.length;
 
     this.spending.forEach((spender) => {
       spender.toSpend = parseFloat(
-        (this.eachPersonShouldSpend - spender.haveSpent).toFixed(2)
+        (eachPersonShouldSpend - spender.haveSpent).toFixed(2)
       );
     });
 
+    let peopleToPay: { person: Person; amount: number }[] = [];
+    let peopleToReceive: { person: Person; amount: number }[] = [];
+
     this.spending.forEach((spender) => {
       if (spender.toSpend < 0) {
-        this.peopleToReceive.push({
+        peopleToReceive.push({
           person: spender.person,
           amount: spender.toSpend,
         });
       }
 
       if (spender.toSpend > 0) {
-        this.peopleToPay.push({
+        peopleToPay.push({
           person: spender.person,
           amount: spender.toSpend,
         });
       }
     });
 
-    this.peopleToPay.sort((a, b) => a.amount - b.amount);
-    this.peopleToReceive.sort((a, b) => b.amount - a.amount);
-    this.runSolution();
+    peopleToPay.sort((a, b) => a.amount - b.amount);
+    peopleToReceive.sort((a, b) => b.amount - a.amount);
+    this.runSolution(peopleToPay, peopleToReceive);
   }
 
-  runSolution() {
-    while (this.peopleToPay.length !== 0 || this.peopleToReceive.length !== 0) {
+  runSolution(
+    peopleToPay: { person: Person; amount: number }[],
+    peopleToReceive: { person: Person; amount: number }[]
+  ) {
+    while (peopleToPay.length !== 0 || peopleToReceive.length !== 0) {
       console.log('Running an iteration');
-      let personToReceive = this.peopleToReceive.pop();
-      let personToPay = this.peopleToPay.pop();
+      let personToReceive = peopleToReceive.pop();
+      let personToPay = peopleToPay.pop();
 
       if (personToReceive && personToPay) {
         //receiver needs more than payer will pay
         if (Math.abs(personToReceive.amount) > Math.abs(personToPay.amount)) {
           personToReceive.amount += personToPay.amount;
-          this.peopleToReceive.push(personToReceive);
+          peopleToReceive.push(personToReceive);
 
           this.solution.push({
             personToPay: personToPay.person,
             personToReceive: personToReceive.person,
-            amount: Number(personToPay.amount.toFixed(2)),
+            amount: personToPay.amount.toFixed(2),
           });
         } else if (
           Math.abs(personToReceive.amount) < Math.abs(personToPay.amount)
         ) {
           personToPay.amount += personToReceive.amount;
-          this.peopleToPay.push(personToPay);
+          peopleToPay.push(personToPay);
 
           this.solution.push({
             personToPay: personToPay.person,
             personToReceive: personToReceive.person,
-            amount: Number(Math.abs(personToReceive.amount).toFixed(2)),
+            amount: Math.abs(personToReceive.amount).toFixed(2),
           });
         } else {
           this.solution.push({
             personToPay: personToPay.person,
             personToReceive: personToReceive.person,
-            amount: Number(personToPay.amount.toFixed(2)),
+            amount: personToPay.amount.toFixed(2),
           });
         }
       }
@@ -153,14 +148,10 @@ export class SplitEngine {
   }
 
   isCompleted() {
-    return this.solution.length !== 0
+    return this.solution.length !== 0;
   }
 
   resetEngine() {
-    this.totalPool = 0;
     this.solution = [];
-    this.eachPersonShouldSpend = 0;
-    this.peopleToPay = [];
-    this.peopleToReceive = [];
   }
 }
