@@ -89,3 +89,7 @@
   width: 250px;
   justify-content: space-between;
 }
+
+input:-webkit-autofill {
+  -webkit-box-shadow: inset 0 0 0 50px #69F0AE;
+}
