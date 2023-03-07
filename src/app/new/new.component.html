@@ -1,7 +1,7 @@
 <div class="new-comp">
   <div id="new-header">
       <h1 id="header-title">SplitEase</h1>
-      <p id="header-desc">Splitting for <u style="font-size: 25px">{{engine.groupName}}</u></p>
+      <p id="header-desc">Splitting for <u style="font-size: 25px">{{this.groupName}}</u></p>
       <div class="header-main">
         <div class="instructions">
           <p style="margin-bottom: 2px;">1. Enter Person's Name. (Optional)</p>
@@ -22,13 +22,13 @@
     </div>
   <div id="splitting-div">
     <div class="card-container">
-      <div *ngFor="let person of this.engine.group; let idx = index" class="person-card">
+      <div *ngFor="let person of this.group; let idx = index" class="person-card">
         <div class="card-header">
           <mat-form-field>
             <mat-label>person name</mat-label>
             <input [(ngModel)]="person.name" name="personName" matInput [placeholder]="getNamePlaceholder(person.id)">
           </mat-form-field>
-          <p *ngIf="showItemsTable(person)" style="margin: 0"><strong>Total: </strong>{{this.currency}}{{this.engine.generatePersonTotalItemCost(person)}}</p>
+          <p *ngIf="showItemsTable(person)" style="margin: 0"><strong>Total: </strong>{{this.currency}}{{this.bill.generatePersonTotalItemCost(person)}}</p>
         </div>
 
         <div class="added-items">
@@ -55,7 +55,7 @@
           </mat-form-field>
           <mat-form-field style="width: 75px">
             <mat-label>item cost</mat-label>
-            <input [(ngModel)]="items[person.id].cost" name="itemCost" type="number" matInput placeholder="0.01">
+            <input [(ngModel)]="items[person.id].cost" name="itemCost" type="number" matInput min="0" placeholder="0.01">
           </mat-form-field>
           <button mat-raised-button (click)="addItemToBill(person.id, idx)">Add</button>
         </form>
@@ -76,7 +76,7 @@
             <th>Receiver</th>
             <th>Amount ({{this.currency}})</th>
           </tr>
-          <tr *ngFor="let solution of this.engine.solution">
+          <tr *ngFor="let solution of this.bill.solution">
             <td style="text-align:center;">{{solution.personToPay.name}}</td>
             <td style="text-align:center;">{{solution.personToReceive.name}}</td>
             <td style="text-align:center;">{{solution.amount}}</td>

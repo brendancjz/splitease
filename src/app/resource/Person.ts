@@ -2,7 +2,7 @@ import { BillItem } from "./BillItem";
 
 export class Person {
   id: number;
-  name: string | undefined;
+  name: string;
 
   constructor(id: number, name: string) {
     this.id = id;

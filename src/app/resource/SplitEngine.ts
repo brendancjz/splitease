@@ -5,20 +5,16 @@ import { Person } from './Person';
 export class SplitEngine {
   groupName: string;
   group: Person[];
+  entries: BillEntry[];
   spending: { person: Person; haveSpent: number; toSpend: number }[];
   solution: { personToPay: Person; personToReceive: Person; amount: string }[];
-  entries: BillEntry[];
+
 
   constructor(groupName?: string, group?: Person[]) {
     this.groupName = groupName || '';
     this.group = group || [];
     this.spending = [];
     this.entries = [];
-
-    for (let i = 0; i < this.group.length; i++) {
-      this.spending.push({ person: this.group[i], haveSpent: 0, toSpend: 0 });
-    }
-
     this.solution = [];
   }
 
@@ -55,18 +51,21 @@ export class SplitEngine {
     return this.entries.filter((entry) => entry.paidBy.id === person.id);
   }
 
-  doSplit() {
+  doSplit(group?: Person[], groupEntries?: BillEntry[]) {
+    this.resetEngine();
+
+    if (group) this.group = group;
+    if (groupEntries) this.entries = groupEntries;
+
     for (let i = 0; i < this.group.length; i++) {
       if (this.group[i].name === '') {
         this.group[i].name = 'Person ' + (this.group[i].id + 1);
       }
-
+      this.spending.push({ person: this.group[i], haveSpent: 0, toSpend: 0 });
       this.spending[i].haveSpent = this.generatePersonTotalItemCost(
         this.spending[i].person
       );
     }
-
-    this.resetEngine();
 
     let totalPool: number = 0;
     this.spending.forEach((spender) => {
@@ -110,7 +109,6 @@ export class SplitEngine {
     peopleToReceive: { person: Person; amount: number }[]
   ) {
     while (peopleToPay.length !== 0 || peopleToReceive.length !== 0) {
-      console.log('Running an iteration');
       let personToReceive = peopleToReceive.pop();
       let personToPay = peopleToPay.pop();
 
@@ -147,11 +145,16 @@ export class SplitEngine {
     }
   }
 
+  getSolution() {
+    return this.solution;
+  }
+
   isCompleted() {
     return this.solution.length !== 0;
   }
 
   resetEngine() {
+    this.spending = [];
     this.solution = [];
   }
 }

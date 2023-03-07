@@ -7,8 +7,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MyGuard } from '../my-guard.guard';
+import { Bill } from '../resource/Bill';
 import { BillEntry } from '../resource/BillEntry';
-import { BillItem } from '../resource/BillItem';
 import { Person } from '../resource/Person';
 import { SplitEngine } from '../resource/SplitEngine';
 
@@ -23,7 +23,9 @@ export class NewComponent implements OnInit {
   myGuard = new MyGuard();
   canDeactivate = () => this.myGuard;
 
-  engine: SplitEngine = new SplitEngine();
+  groupName: string = "";
+  group: Person[] = [];
+  bill: Bill = new Bill();
   items: { name: string | undefined; cost: number | undefined }[] = [];
   shouldShowResultTable: boolean = false;
   currency: string = '£';
@@ -36,20 +38,20 @@ export class NewComponent implements OnInit {
 
   doSetUp() {
     const numOfPeople = this.route.snapshot.params['num'];
-    const groupName = this.route.snapshot.params['name'];
-    let group: Person[] = [];
+    this.groupName = this.route.snapshot.params['name'];
+
     for (let i = 0; i < numOfPeople; i++) {
       let person: Person = new Person(i, '');
-      group.push(person);
+      this.group.push(person);
       this.items.push({ name: undefined, cost: undefined });
     }
 
-    this.engine = new SplitEngine(groupName, group);
+    this.bill.splitEngine = new SplitEngine(this.groupName);
   }
 
   addItemToBill(id: number, idx: number) {
     if (this.items[id].name != undefined && this.items[id].cost != undefined) {
-      this.engine.createNewBillEntry(this.items[id], this.engine.group[id], this.engine.group)
+      this.bill.createNewBillEntry(this.items[id], this.group[id], this.group);
       this.items[id] = { name: undefined, cost: undefined };
     }
 
@@ -60,21 +62,21 @@ export class NewComponent implements OnInit {
   }
 
   deleteEntry(entry: BillEntry) {
-    this.engine.deleteEntry(entry);
+    this.bill.deleteEntry(entry);
   }
 
   showItemsTable(person: Person): boolean {
-    return this.engine.doesPersonHaveEntries(person);
+    return this.bill.doesPersonHaveEntries(person);
   }
 
   getPersonEntries(person: Person) {
-    return this.engine.getPersonEntries(person);
+    return this.bill.getPersonEntries(person);
   }
 
   doSplit() {
     console.log(this.currency);
-    this.engine.doSplit();
-    this.shouldShowResultTable = this.engine.isCompleted();
+    this.bill.runSplitEngine();
+    this.shouldShowResultTable = this.bill.isCompleted();
   }
 
   confirmNavigationToHome() {
